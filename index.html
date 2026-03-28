@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUMAN 3.0 发展评估</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --bg3: #1a1a28;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text2: #9898b0;
+    --text3: #686880;
+    --accent: #6c5ce7;
+    --accent2: #a29bfe;
+    --mind: #6c5ce7;
+    --body: #00b894;
+    --spirit: #fd79a8;
+    --vocation: #fdcb6e;
+    --glow-mind: rgba(108,92,231,0.3);
+    --glow-body: rgba(0,184,148,0.3);
+    --glow-spirit: rgba(253,121,168,0.3);
+    --glow-vocation: rgba(253,203,110,0.3);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Landing */
+  #landing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    animation: fadeIn 1s ease;
+  }
+  #landing h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--spirit));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  #landing .subtitle {
+    font-size: 1.1rem;
+    color: var(--text2);
+    margin-bottom: 48px;
+    max-width: 500px;
+  }
+  #landing .model-desc {
+    color: var(--text3);
+    font-size: 0.88rem;
+    max-width: 600px;
+    margin-bottom: 40px;
+    line-height: 1.8;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #7c6cf0);
+    color: #fff;
+    border: none;
+    padding: 16px 48px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(108,92,231,0.4);
+  }
+
+  /* Assessment */
+  #assessment { display: none; animation: fadeIn 0.5s ease; }
+
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--bg3);
+    z-index: 100;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--mind), var(--spirit), var(--vocation));
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  .quad-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .quad-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+  .quad-icon.mind { background: rgba(108,92,231,0.15); color: var(--mind); border: 1px solid rgba(108,92,231,0.3); }
+  .quad-icon.body { background: rgba(0,184,148,0.15); color: var(--body); border: 1px solid rgba(0,184,148,0.3); }
+  .quad-icon.spirit { background: rgba(253,121,168,0.15); color: var(--spirit); border: 1px solid rgba(253,121,168,0.3); }
+  .quad-icon.vocation { background: rgba(253,203,110,0.15); color: var(--vocation); border: 1px solid rgba(253,203,110,0.3); }
+
+  .quad-title { font-size: 1.3rem; font-weight: 700; }
+  .quad-subtitle { font-size: 0.88rem; color: var(--text3); margin-bottom: 32px; }
+
+  .question-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    transition: all 0.3s;
+  }
+  .question-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(108,92,231,0.1);
+  }
+  .question-number {
+    font-size: 0.78rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .question-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .option-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .option-card:hover {
+    border-color: var(--text3);
+    background: var(--bg3);
+  }
+  .option-card.selected {
+    border-color: var(--accent);
+    background: rgba(108,92,231,0.08);
+    box-shadow: 0 0 20px rgba(108,92,231,0.08);
+  }
+  .option-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.25s;
+    position: relative;
+  }
+  .option-card.selected .option-radio {
+    border-color: var(--accent);
+  }
+  .option-card.selected .option-radio::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .option-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    opacity: 0.6;
+  }
+  .option-label.l1 { color: #ff6b6b; }
+  .option-label.l2 { color: #fdcb6e; }
+  .option-label.l3 { color: #00b894; }
+  .option-text {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .option-card.selected .option-text { color: #fff; }
+
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+    gap: 12px;
+  }
+  .btn-nav {
+    background: var(--bg3);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 12px 32px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-nav:hover { background: var(--border); }
+  .btn-nav.next { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-nav.next:hover { box-shadow: 0 4px 20px rgba(108,92,231,0.3); }
+
+  .phase-indicator {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .phase-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .phase-dot.active { background: var(--accent); width: 24px; border-radius: 4px; }
+  .phase-dot.done { background: var(--accent2); }
+
+  /* Results */
+  #results { display: none; animation: fadeIn 0.8s ease; }
+
+  .result-header {
+    text-align: center;
+    padding: 48px 0 32px;
+  }
+  .result-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .metatype-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), var(--spirit));
+    color: #fff;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .metatype-desc {
+    color: var(--text2);
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 1rem;
+  }
+
+  .result-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 20px;
+  }
+  .result-section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .result-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text2);
+  }
+
+  .quad-result {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .quad-result-item {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .quad-result-item.full { grid-column: 1 / -1; }
+  .quad-result-item label {
+    font-size: 0.78rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quad-result-item p {
+    font-size: 0.92rem;
+    color: var(--text);
+  }
+
+  .level-bar {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .level-segment {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--bg3);
+    transition: background 0.5s;
+  }
+  .level-segment.filled-mind { background: var(--mind); }
+  .level-segment.filled-body { background: var(--body); }
+  .level-segment.filled-spirit { background: var(--spirit); }
+  .level-segment.filled-vocation { background: var(--vocation); }
+
+  .strategy-phase {
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+    margin-bottom: 20px;
+  }
+  .strategy-phase h3 {
+    color: var(--accent2);
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+  }
+  .strategy-item {
+    margin-bottom: 10px;
+  }
+  .strategy-item strong {
+    color: var(--text2);
+    font-size: 0.85rem;
+  }
+  .strategy-item p {
+    font-size: 0.92rem;
+  }
+
+  .warning-box {
+    background: rgba(253,121,168,0.08);
+    border: 1px solid rgba(253,121,168,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .warning-box h3 {
+    color: var(--spirit);
+    margin-bottom: 8px;
+  }
+  .warning-box p { font-size: 0.9rem; color: var(--text2); }
+
+  .next-step-box {
+    background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(253,121,168,0.1));
+    border: 1px solid rgba(108,92,231,0.3);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 32px 0;
+    text-align: center;
+  }
+  .next-step-box h2 {
+    justify-content: center;
+    color: var(--accent2);
+  }
+
+  .truth-section {
+    background: var(--bg);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+    border: 1px solid var(--border);
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--text2);
+  }
+
+  .comparable {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .comparable .name {
+    font-weight: 600;
+    color: var(--accent2);
+    font-size: 0.9rem;
+  }
+  .comparable p { font-size: 0.88rem; color: var(--text2); margin-top: 4px; }
+
+  .phase-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .phase-label.dissonance { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+  .phase-label.uncertainty { background: rgba(253,203,110,0.15); color: #fdcb6e; }
+  .phase-label.discovery { background: rgba(0,184,148,0.15); color: #00b894; }
+
+  .btn-restart {
+    background: var(--bg3);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 14px 40px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: block;
+    margin: 40px auto;
+  }
+  .btn-restart:hover { background: var(--border); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    #landing h1 { font-size: 2rem; }
+    .container { padding: 24px 16px; }
+    .question-card { padding: 24px 20px; }
+    .result-section { padding: 24px 20px; }
+    .quad-result { grid-template-columns: 1fr; }
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeIn 0.5s ease; }
+
+  /* Typing effect for results */
+  .typing-line {
+    opacity: 0;
+    animation: typeLine 0.6s ease forwards;
+  }
+  @keyframes typeLine {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  .cross-dynamics {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .dynamic-item {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .dynamic-item .label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+  .dynamic-item p { font-size: 0.92rem; }
+
+  .glitch-section { margin-top: 24px; }
+  .glitch-level {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="landing" class="container">
+  <h1>HUMAN 3.0</h1>
+  <p class="subtitle">发展评估 — 你的多维发展图谱</p>
+  <p class="model-desc">
+    HUMAN 3.0 是一个综合发展框架，通过心智、身体、精神、事业四个象限，
+    绘制你的当前发展图谱，识别你的元类型和生活方式原型，
+    并提供通过生活方式整合达到下一层级的清晰路径。
+  </p>
+  <button class="btn-primary" onclick="startAssessment()">开始评估</button>
+</div>
+
+<div id="assessment" class="container">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div id="assessmentContent"></div>
+</div>
+
+<div id="results" class="container"></div>
+
+<script>
+// ==================== DATA MODEL ====================
+const QUADRANTS = ['mind', 'body', 'spirit', 'vocation'];
+const QUAD_INFO = {
+  mind: { icon: 'M', name: '心智', subtitle: '个人内在世界 — 思想、信念、世界观', color: 'mind' },
+  body: { icon: 'B', name: '身体', subtitle: '个人外在世界 — 健康、能量、身体实践', color: 'body' },
+  spirit: { icon: 'S', name: '精神', subtitle: '集体内在世界 — 关系、意义、归属感', color: 'spirit' },
+  vocation: { icon: 'V', name: '事业', subtitle: '集体外在世界 — 价值创造、影响力、贡献', color: 'vocation' }
+};
+
+const QUESTIONS = {
+  mind: [
+    {
+      id: 'm1', phase: 'initial',
+      text: '当你遇到一个与你的世界观相矛盾的观点时，你的第一直觉是什么？',
+      options: [
+        { level: 1, text: '本能地抵触或排斥，觉得对方是错的。我坚信的东西不会轻易被撼动。' },
+        { level: 2, text: '会停下来想一想，用自己的逻辑去判断对错。我愿意改变想法，但需要被说服。' },
+        { level: 3, text: '感到兴奋——矛盾意味着我的模型有盲区。我会主动寻找这个观点成立的条件，然后更新自己的理解框架。' }
+      ]
+    },
+    {
+      id: 'm2', phase: 'initial',
+      text: '你如何确定什么是真实的或有价值的信息？',
+      options: [
+        { level: 1, text: '看信源靠不靠谱——权威机构、知名专家、主流媒体说的基本就是可信的。' },
+        { level: 2, text: '我会交叉验证，看多个来源，用自己的判断力去辨别。我有自己的信息筛选标准。' },
+        { level: 3, text: '我有一套动态更新的信息处理系统——不是简单判断"真假"，而是评估信息在什么框架下成立、什么条件下失效，然后整合进自己的认知地图。' }
+      ]
+    },
+    {
+      id: 'm3', phase: 'initial',
+      text: '描述一下你上一次重大的信念改变——是什么触发了它？',
+      options: [
+        { level: 1, text: '我不太记得有什么"重大改变"，我的核心信念一直比较稳定，或者改变是被外界事件迫不得已的。' },
+        { level: 2, text: '有过几次，通常是读了某本书、遇到某个人或经历某次挫折后，我开始重新审视自己的想法。过程有点痛苦但很有收获。' },
+        { level: 3, text: '信念改变对我来说是持续的过程，而非偶发事件。我有意识地暴露自己于不同观点，主动寻找能挑战自己核心假设的信息。改变不是危机，是迭代。' }
+      ]
+    },
+    {
+      id: 'm4', phase: 'level_check',
+      text: '当你意识到自己可能是错的时，你的内心反应是什么？',
+      options: [
+        { level: 1, text: '不舒服，甚至有点抗拒。如果被证明错了，我会感到尴尬或挫败。' },
+        { level: 2, text: '有点不舒服，但我会强迫自己去面对。错了就错了，改过来就好——虽然自尊心还是会抗议一下。' },
+        { level: 3, text: '几乎没有负面反应。发现自己错了意味着模型在进化，这是好事。我甚至会主动设计机制来让自己更早发现错误。' }
+      ]
+    },
+    {
+      id: 'm5', phase: 'level_check',
+      text: '你能举出一个你曾经坚信不疑、后来彻底推翻的观点吗？',
+      options: [
+        { level: 1, text: '想不出什么特别大的。我的世界观基本是稳定的，如果变了那也是因为事实太明显了。' },
+        { level: 2, text: '有，比如曾经认为"努力就一定能成功"或者"某类人是怎样的"，后来通过自己的经历推翻了。过程不容易但很真实。' },
+        { level: 3, text: '太多了，以至于我已经不把任何观点当作"不可动摇"的。我有一个"待更新"列表，定期审视自己的核心假设。最深刻的一次转变让我意识到——之前的我一直在用错误的框架回答正确的问题。' }
+      ]
+    },
+    {
+      id: 'm6', phase: 'stage_check',
+      text: '在你的思想世界中，有哪些方面感觉陈旧、受限，或者让你隐约感到不满？',
+      options: [
+        { level: 1, text: '没太想过这个问题。我忙着过日子，想那些干嘛？或者偶尔觉得不对劲但不知道哪里不对。' },
+        { level: 2, text: '我清楚自己的短板在哪里——比如容易陷入某个思维定势，或者在某个领域的知识储备不够。我有在努力改进。' },
+        { level: 3, text: '我能精确定位自己的认知边界，并且正在有意识地拓展它们。不满已经不是"迷茫"，而是"方向明确但需要时间和迭代"。' }
+      ]
+    },
+    {
+      id: 'm7', phase: 'stage_check',
+      text: '你最近有没有经历过一段"停不下来"的学习或思考期？什么都想研究，时间飞逝的那种？',
+      options: [
+        { level: 1, text: '没有过这种感觉。学习对我来说是任务，不是让人上瘾的事。' },
+        { level: 2, text: '有过，有时会突然对某个话题着迷，疯狂研究几天到几周。但热度会过去，然后回到正常生活。' },
+        { level: 3, text: '经常，而且我学会了识别和利用这种状态。我甚至设计了工作流来捕获这些高峰期的产出，让它们不只停留在"兴奋"层面。' }
+      ]
+    },
+    {
+      id: 'm8', phase: 'traits',
+      text: '哪些概念你能清楚解释给别人听，但在自己的生活中却做不到？（知识 > 执行的差距）',
+      options: [
+        { level: 1, text: '没觉得有这种差距。我懂的东西基本都在用，或者我本来懂的就不多。' },
+        { level: 2, text: '挺多的，比如知道该冥想但做不到、知道该早起但起不来、知道不该焦虑但还是焦虑。这个差距让我有点挫败。' },
+        { level: 3, text: '我以前有很多这种差距，但已经建立了系统来缩小它——把知识转化为"最小可行习惯"再逐步升级。剩余的差距是已知的、在处理中的，而不是隐形的。' }
+      ]
+    }
+  ],
+  body: [
+    {
+      id: 'b1', phase: 'initial',
+      text: '描述你与你身体的关系——它是你的盟友、敌人，还是单纯的工具？',
+      options: [
+        { level: 1, text: '工具吧。用到的时候才想起来，不工作时基本忽略它。或者更糟——它经常给我添麻烦（累、痛、病）。' },
+        { level: 2, text: '我知道它很重要，也在努力善待它——健身、注意饮食、偶尔体检。但老实说，有时候还是觉得它拖了后腿，比如精力不够用的时候。' },
+        { level: 3, text: '它是我的合作者。我持续倾听它的信号，而不是强加意志力。身体状态和认知、情绪、创造力的关联我都能感知到，并且据此调整自己的节奏。' }
+      ]
+    },
+    {
+      id: 'b2', phase: 'initial',
+      text: '什么驱动你的健康/健身决定——外表、表现、长寿，还是感觉好？',
+      options: [
+        { level: 1, text: '说实话，主要看外表或者因为别人说该运动了。或者干脆没怎么想过为什么。' },
+        { level: 2, text: '多重驱动——想看起来好、有体能、也为了健康。但我有时会在不同目标之间摇摆，不太统一。' },
+        { level: 3, text: '核心驱动是"整体功能"——精力、认知清晰度、情绪稳定性。外表是副产品，不是目标。我用身体作为反馈系统来校准整个生活状态。' }
+      ]
+    },
+    {
+      id: 'b3', phase: 'initial',
+      text: '当生活变得忙碌或混乱时，你的身体习惯（运动、饮食、睡眠）会怎样？',
+      options: [
+        { level: 1, text: '第一个被放弃。忙起来吃饭都不规律，更别说运动了。等闲下来再补回来吧。' },
+        { level: 2, text: '会打折扣但不会完全放弃——可能从一小时的训练变成二十分钟，饮食也会放宽标准，但至少还在维持。需要意志力。' },
+        { level: 3, text: '基本不受影响。不是因为意志力强，而是因为这些习惯已经自动化了，不需要"决定"要不要做。压力来的时候我反而更注意恢复。' }
+      ]
+    },
+    {
+      id: 'b4', phase: 'level_check',
+      text: '你对自己身体的了解有多深？你知道什么对你真正有效吗？',
+      options: [
+        { level: 1, text: '不太了解。跟着感觉走，或者别人推荐什么就试什么。效果好不好也说不清楚。' },
+        { level: 2, text: '有基本的了解——知道什么食物会让我不舒服，什么运动形式我喜欢，大概需要多少睡眠。但我还在不断试错和调整。' },
+        { level: 3, text: '我有一套个性化的身体操作系统——精确了解不同食物、运动、睡眠模式对我的认知、情绪和能量水平的影响。这个系统在不断迭代。' }
+      ]
+    },
+    {
+      id: 'b5', phase: 'level_check',
+      text: '你的身体实践是否服务于更大的生活目标？还是健康本身就是一个孤立的项目？',
+      options: [
+        { level: 1, text: '健康不是项目，是"有空再说"的事。我没有把身体和我的其他目标联系起来想过。' },
+        { level: 2, text: '有一定的联系——比如健身让我精力更好从而工作更高效。但说实话，很多时候还是在"为健身而健身"。' },
+        { level: 3, text: '身体实践是整个生活系统的核心组件。运动不只是锻炼身体，也是思考时间；饮食不只是营养，也是一种自我管理实践。身体状态直接决定了我在所有其他象限的表现。' }
+      ]
+    },
+    {
+      id: 'b6', phase: 'stage_check',
+      text: '你有没有觉得目前的身体状态已经"卡住"了——无论怎么努力都无法突破？',
+      options: [
+        { level: 1, text: '谈不上卡住，因为我本来就没怎么努力过。或者有过几次开始的冲动但很快放弃了。' },
+        { level: 2, text: '是的，有明显瓶颈。换了不同方法、调整了计划，但效果在递减。有点沮丧但不想放弃。' },
+        { level: 3, text: '瓶颈是预期的，我把它们当作信号而非障碍。通常意味着需要改变变量（恢复、压力管理、或者完全不同的刺激模式），而不是更努力地做同样的事。' }
+      ]
+    },
+    {
+      id: 'b7', phase: 'stage_check',
+      text: '你的身体是否在向你发出信号（疲惫、疼痛、失眠、消化问题）而你一直在忽略？',
+      options: [
+        { level: 1, text: '经常忽略。或者已经习惯这些信号了，觉得"大家都这样"。偶尔严重了才去看。' },
+        { level: 2, text: '我会注意到这些信号，但有时还是选择硬扛。知道应该休息，但手头的事放不下。内疚感和焦虑交替出现。' },
+        { level: 3, text: '我建立了一套信号监测机制，在问题变严重之前就做出调整。身体信号对我来说是数据，不是噪音。我尊重身体的"请求"而不是"命令"。' }
+      ]
+    },
+    {
+      id: 'b8', phase: 'traits',
+      text: '在健康和身体方面，你"知道但做不到"的事情是什么？',
+      options: [
+        { level: 1, text: '知道应该运动和注意饮食，但就是做不到。每次都是"从明天开始"然后不了了之。' },
+        { level: 2, text: '知道很多——该吃什么、该怎么练、该睡多久——但执行起来总是打折。信息充足但行动跟不上，这让我很沮丧。' },
+        { level: 3, text: '这个差距曾经很大，但已经通过系统化缩小。剩下的差距不是"不知道"的问题，而是优先级和环境的精细调优。' }
+      ]
+    }
+  ],
+  spirit: [
+    {
+      id: 's1', phase: 'initial',
+      text: '当一切感觉毫无意义时，你如何重新找到方向感？',
+      options: [
+        { level: 1, text: '找点事做让自己忙起来，或者刷手机、吃东西、找人聊天。不想面对那种感觉。' },
+        { level: 2, text: '我会主动寻找刺激——新的项目、旅行、或者学习新东西。有时候管用，有时候只是转移了注意力，空虚感还在。' },
+        { level: 3, text: '我把虚无感当作信号而非异常。通常意味着我需要更深层的连接（而非更多的刺激）。我会回归那些经过验证的意义锚点——深度对话、创造性工作、或者与比自己更大的事物重新对齐。' }
+      ]
+    },
+    {
+      id: 's2', phase: 'initial',
+      text: '描述你与社区的关系——社交对你来说是必要的、可选的，还是不可或缺的？',
+      options: [
+        { level: 1, text: '可选甚至有点负担。我不太需要社交，或者说我的社交主要是被动参与的。' },
+        { level: 2, text: '必要但我有时会逃避。我知道关系重要，但社交消耗精力。我有几个朋友，但很难建立新的深度连接。' },
+        { level: 3, text: '不可或缺，而且我有意识地在投资。我区分了"消耗性社交"和"滋养性连接"，并建立了自己的社群——不一定是传统的，但能提供真正的归属感和挑战。' }
+      ]
+    },
+    {
+      id: 's3', phase: 'initial',
+      text: '你如何理解"意义"这件事？',
+      options: [
+        { level: 1, text: '意义就是按照社会期待活着——有份好工作、成个家、不惹事。或者我根本没想过这个问题。' },
+        { level: 2, text: '意义需要自己创造，我对此深信不疑。但说实话，有时候"创造意义"本身也感觉挺空的。我在不同哲学之间摇摆。' },
+        { level: 3, text: '意义不是一个"找到"或"创造"的静态物件，而是一个持续的实践——通过承诺、服务和深度参与来生成。我不再追问"人生的意义是什么"，而是问"今天的行动在为什么服务"。' }
+      ]
+    },
+    {
+      id: 's4', phase: 'level_check',
+      text: '你有没有过一种体验——感觉自己与某种更大的东西连接在一起？',
+      options: [
+        { level: 1, text: '没有过。或者如果有过我也没当回事，觉得那只是情绪波动。' },
+        { level: 2, text: '有过几次——在旅行中、在演出中、在深度对话中。那种感觉很好但很短暂，像是一种偶尔降临的状态而非持续的现实。' },
+        { level: 3, text: '这种体验是可复现的，而且我有意识地设计生活来创造更多这样的时刻。它不是"神秘体验"，而是一种与当下深度对齐的状态。我能识别出什么条件会触发它。' }
+      ]
+    },
+    {
+      id: 's5', phase: 'level_check',
+      text: '当身边的人陷入痛苦时，你的第一反应是帮忙、分析、保护自己，还是感到负担？',
+      options: [
+        { level: 1, text: '不知道该怎么办。可能会说些安慰的话，但内心其实想保持距离。或者觉得"这是他们自己的事"。' },
+        { level: 2, text: '第一反应是帮忙或分析问题。但有时会过度投入然后精疲力竭，或者相反——在自己状态不好的时候完全封闭。' },
+        { level: 3, text: '我能根据情况灵活切换——有时候是陪伴，有时候是给予空间，有时候是提供视角。我理解"帮忙"不总是最优解，有时候最好的支持是信任对方有能力自己处理。' }
+      ]
+    },
+    {
+      id: 's6', phase: 'stage_check',
+      text: '在意义和归属感方面，你目前最大的困惑或不满足是什么？',
+      options: [
+        { level: 1, text: '没觉得有什么困惑。日子不就这样过嘛。或者偶尔有空虚感但很快就被忙覆盖了。' },
+        { level: 2, text: '有明显的困惑——感觉自己在漂，找不到扎根的感觉。想建立更深的关系但又害怕暴露自己。在"追求自由"和"渴望归属"之间拉扯。' },
+        { level: 3, text: '困惑还在但已经变成了"高级问题"——不是"有没有意义"，而是"如何让我的意义框架更精炼、更有影响力"。我在探索如何把个人的意义实践转化为社区价值。' }
+      ]
+    },
+    {
+      id: 's7', phase: 'stage_check',
+      text: '你的核心关系（家人、挚友、伴侣）是否在滋养你，还是在消耗你？',
+      options: [
+        { level: 1, text: '没想过这个问题，或者想了也不敢面对。关系就是这样吧，哪有完美的。' },
+        { level: 2, text: '我能分辨哪些关系在滋养我、哪些在消耗我。但面对消耗性关系时，我经常在"忍耐"和"切割"之间犹豫不决。' },
+        { level: 3, text: '我对关系质量有清晰的边界和标准。滋养性关系我在投资，消耗性关系我有策略地处理（转化或退出）。我不会让有毒关系悄悄侵蚀其他象限。' }
+      ]
+    },
+    {
+      id: 's8', phase: 'traits',
+      text: '在关系和意义方面，你"懂很多道理但做不到"的是什么？',
+      options: [
+        { level: 1, text: '不太懂也不太做。关系嘛，顺其自然就好。' },
+        { level: 2, text: '懂很多——知道该坦诚、该表达感谢、该设边界、该原谅——但实际操作时情感惯性太强，道理秒忘。尤其在亲密关系中。' },
+        { level: 3, text: '这个差距曾经很大。我现在通过"关系习惯"来系统化缩小——比如定期的深度对话、感恩表达、冲突处理流程。不是完美，但有意识在进化。' }
+      ]
+    }
+  ],
+  vocation: [
+    {
+      id: 'v1', phase: 'initial',
+      text: '你的工作对你来说是什么——你需要做的事、你拥有的身份，还是你这个人本身？',
+      options: [
+        { level: 1, text: '就是份工作，赚钱养活自己。或者说是社会期望我应该做的事。' },
+        { level: 2, text: '是我的身份和成就来源——我想在职业上出人头地。但偶尔也会问自己"这是我想要的吗"。' },
+        { level: 3, text: '是我表达价值和创造影响的媒介。工作不是"我做什么"而是"我通过什么方式创造价值"。如果明天换一个完全不同的领域，核心能力是可以迁移的。' }
+      ]
+    },
+    {
+      id: 'v2', phase: 'initial',
+      text: '你如何衡量职业成功——收入、影响力、自由度，还是内心的满足感？',
+      options: [
+        { level: 1, text: '收入和稳定性是第一位的。如果还有社会地位就更好了。' },
+        { level: 2, text: '收入重要，但自由度和成就感也很重要。我在"赚钱"和"做喜欢的事"之间寻找平衡，经常感到矛盾。' },
+        { level: 3, text: '我的衡量标准是"杠杆率"——单位时间创造的价值和影响。收入是副产品而非目标。真正的成功是当我停止工作时，价值仍在持续产生。' }
+      ]
+    },
+    {
+      id: 'v3', phase: 'initial',
+      text: '如果金钱和地位完全不是问题，你会每天做什么？',
+      options: [
+        { level: 1, text: '可能就是放松、玩、旅行？没认真想过。或者反过来——可能还是不知道该干嘛，会感到空虚。' },
+        { level: 2, text: '有一些想法但不太清晰。可能是做自己喜欢的事，但"喜欢的事"能变成职业吗？不确定。在探索中。' },
+        { level: 3, text: '说实话，我现在的日常已经和"金钱不是问题"时的理想状态非常接近。不是因为我有了很多钱，而是因为我设计了让工作本身就有意义和回报的生活结构。' }
+      ]
+    },
+    {
+      id: 'v4', phase: 'level_check',
+      text: '你在工作中是在"玩别人的游戏"还是在"创造自己的游戏"？',
+      options: [
+        { level: 1, text: '玩别人的游戏。规则是公司定的，我按规则办事，争取升职加薪。这就是职场的规则嘛。' },
+        { level: 2, text: '在尝试创造自己的游戏——有副业、有个人项目、或者想跳出来单干。但主力还是在别人的系统里。' },
+        { level: 3, text: '我明确地在设计自己的游戏。即使还在某个组织内，我也在重新定义自己的角色和价值创造方式。我有意识地选择参与哪些"游戏"并设计退出策略。' }
+      ]
+    },
+    {
+      id: 'v5', phase: 'level_check',
+      text: '你的收入结构是怎样的？你对经济自由的定义是什么？',
+      options: [
+        { level: 1, text: '纯工资收入。经济自由就是赚更多钱、财务安全。被动收入对我来说是个很遥远的概念。' },
+        { level: 2, text: '主要是主动收入，可能在尝试一些副业或投资。经济自由对我来说是不用为钱焦虑，可以做一些选择而不仅仅是为了生存。' },
+        { level: 3, text: '我有意识地构建多元收入结构——主动收入、被动收入、和"价值资产"（知识产权、系统、品牌）。经济自由不是终点而是工具——让我能做出基于价值而非恐惧的决定。' }
+      ]
+    },
+    {
+      id: 'v6', phase: 'stage_check',
+      text: '在事业方面，你最隐秘的不满足是什么？',
+      options: [
+        { level: 1, text: '没觉得有不满足。或者说有，但觉得"这样也挺好"，不敢想太多，想了也没用。' },
+        { level: 2, text: '有很多不满足——觉得自己在浪费时间、没有创造真正的价值、被困在一个不上不下的位置。想改变但不确定方向。' },
+        { level: 3, text: '不满足已经变成了"建设性不满"——不是抱怨而是燃料。我知道下一阶段需要什么（更大的杠杆、更深的系统思维、更多的价值创造），正在有意识地建设。' }
+      ]
+    },
+    {
+      id: 'v7', phase: 'stage_check',
+      text: '你有没有尝试过"走自己的路"？结果如何？',
+      options: [
+        { level: 1, text: '没有过，风险太大。或者有过短暂的冲动但很快放弃了。安全第一。' },
+        { level: 2, text: '尝试过——创业、转行、或自由职业。有成功也有失败。最大的收获是：自己走路比想象中更难，但也比想象中更值得。' },
+        { level: 3, text: '走自己的路不是一次性的决定而是持续的状态。我已经建立了支持自主性生活方式的系统和技能。失败是迭代成本，不是对"走自己的路"的否定。' }
+      ]
+    },
+    {
+      id: 'v8', phase: 'traits',
+      text: '在事业和金钱方面，你"知道但做不到"的是什么？',
+      options: [
+        { level: 1, text: '不太知道也不太做。工作就是工作，赚钱就是赚钱，没想那么复杂。' },
+        { level: 2, text: '知道应该投资自己、建立被动收入、提升高价值技能——但执行力跟不上。时间管理是一团糟，重要但不紧急的事永远被推后。' },
+        { level: 3, text: '通过系统化实践大幅缩小了这个差距。不是靠意志力而是靠环境设计和习惯架构。偶尔还会打折，但有纠偏机制。' }
+      ]
+    }
+  ]
+};
+
+const ADDITIONAL_QUESTIONS = {
+  lifestyle: [
+    { id: 'ls1', text: '如果一周有 100 小时自由分配，你会怎么分配给四个领域？',
+      options: [
+        { level: 1, text: '说不上来，基本是被事情推着走。哪个紧急就给哪个，没什么系统分配。' },
+        { level: 2, text: '大概有分配意识但经常失衡。比如知道该运动但工作一来就放弃了。有理想分配但没有能力执行。' },
+        { level: 3, text: '我有明确的分配框架而且能基本执行。更重要的是，四个象限不是在争抢时间，而是在相互支持——运动提高工作效率，深度关系激发创造力。' }
+      ]
+    },
+    { id: 'ls2', text: '你觉得你生活中最大的"虚假转变"是什么——看起来很厉害但实际没有真正掌握的？',
+      options: [
+        { level: 1, text: '不太理解什么叫"虚假转变"。我什么样就是什么样。' },
+        { level: 2, text: '能想到一些——比如收藏了大量文章但没读过、买了课程没上完、或者看起来很忙但没有产出。心里有数但不太敢承认。' },
+        { level: 3, text: '我对"虚假转变"保持警惕，定期自我审查。当发现自己在假装进步时，我会停下来问"真正改变的是什么"。虽然不能完全消除，但识别速度越来越快。' }
+      ]
+    },
+    { id: 'ls3', text: '当你在一个领域取得进步时，通常会牺牲哪个领域？',
+      options: [
+        { level: 1, text: '没注意过这种关联。或者觉得牺牲是正常的，没办法的事。' },
+        { level: 2, text: '很清楚这种模式——工作忙就不运动，恋爱了就忘了朋友。知道不好但感觉像是不可避免的取舍。' },
+        { level: 3, text: '我设计了自己的系统来最小化这种"零和效应"。不是完美消除，但当象限A进步时象限B不会自动退化。关键是找到整合点而非分配点。' }
+      ]
+    }
+  ],
+  glitch: [
+    { id: 'gl1', text: '你目前是否在广泛使用 AI 工具？你如何确保自己在保持独立思考？',
+      options: [
+        { level: 1, text: '经常用，基本上什么都在问 AI。没太想过独立思考的问题——AI 比我想得快嘛。' },
+        { level: 2, text: '用得不少，知道有依赖风险，所以会刻意在某些场景下不用 AI。但界限不太清晰，有时候会不自觉地依赖。' },
+        { level: 3, text: '有意识地使用——清楚定义哪些是"增强"、哪些是"替代"，对后者保持警惕。定期做"断连测试"来确保自己的核心思维能力没有萎缩。' }
+      ]
+    },
+    { id: 'gl2', text: '你是否尝试过任何改变意识状态的方式（冥想、致幻剂、极限体验等）？',
+      options: [
+        { level: 1, text: '没有，也不太想尝试。觉得那些东西不靠谱或者有危险。' },
+        { level: 2, text: '尝试过一些——冥想、或某种深度体验。有过深刻的感受但不确定如何整合进日常生活。体验和日常之间有断层。' },
+        { level: 3, text: '有经验并且有系统化的整合实践。我理解这些体验的价值和局限，不会把它们当作"灵丹妙药"也不会完全回避。有进入策略也有退出策略。' }
+      ]
+    },
+    { id: 'gl3', text: '你做过或正在考虑哪些"极端"的生活变动？驱动你的是什么？',
+      options: [
+        { level: 1, text: '没有也不太考虑。变动意味着风险和不确定，安全第一。' },
+        { level: 2, text: '考虑过甚至做过一些——辞职、搬迁、关系改变。驱动我的是对现状的不满和对更好生活的渴望，但有时候分不清哪些是深思熟虑、哪些是逃避冲动。' },
+        { level: 3, text: '我主动设计生活变动作为成长加速器——但每次变动都有清晰的目标、风险评估和退出策略。不是因为"受够了"而是因为"下一阶段需要"。' }
+      ]
+    }
+  ],
+  regression: [
+    { id: 'rg1', text: '你生活中有哪些方面比两年前更糟了？',
+      options: [
+        { level: 1, text: '说不上来，感觉差不多吧。或者不敢仔细想，怕面对。' },
+        { level: 2, text: '能说出几个——可能是身材变差了、社交减少了、或者某项技能生疏了。知道问题存在但一直没有系统地去解决。' },
+        { level: 3, text: '我有定期回顾的习惯，所以退行会被及早发现。即使出现了退行，也能相对快速地识别原因并重新激活。退行是信号，不是失败。' }
+      ]
+    },
+    { id: 'rg2', text: '你有没有感觉自己在某个曾经擅长的领域"生锈"了？',
+      options: [
+        { level: 1, text: '没有，因为我本来也不觉得自己在哪个领域特别擅长。' },
+        { level: 2, text: '有这种感觉。可能是某个技能或习惯，以前做得不错但因为环境变化或精力分配问题慢慢荒废了。想重新捡起来但总觉得缺个契机。' },
+        { level: 3, text: '偶尔会出现，但我有"防锈机制"——即使是维护性的最低投入也能防止完全退化。对真正重要的能力，我设计了强制性的最低实践频率。' }
+      ]
+    }
+  ]
+};
+
+// ==================== STATE ====================
+let currentQuad = 0;
+let currentQ = 0;
+let phase = 'quadrants'; // quadrants -> lifestyle -> glitch -> regression -> results
+let answers = {};
+let allSections = ['mind', 'body', 'spirit', 'vocation', 'lifestyle', 'glitch', 'regression'];
+let currentSectionIdx = 0;
+
+// ==================== NAVIGATION ====================
+function startAssessment() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('assessment').style.display = 'block';
+  currentSectionIdx = 0;
+  phase = 'quadrants';
+  renderSection();
+}
+
+function getAllQuestionsInSection(section) {
+  if (section === 'lifestyle') return ADDITIONAL_QUESTIONS.lifestyle;
+  if (section === 'glitch') return ADDITIONAL_QUESTIONS.glitch;
+  if (section === 'regression') return ADDITIONAL_QUESTIONS.regression;
+  return QUESTIONS[section] || [];
+}
+
+function getTotalQuestions() {
+  let total = 0;
+  for (let s of allSections) total += getAllQuestionsInSection(s).length;
+  return total;
+}
+
+function getAnsweredCount() {
+  let count = 0;
+  for (let key in answers) if (answers[key] && answers[key].trim()) count++;
+  return count;
+}
+
+function updateProgress() {
+  let pct = (getAnsweredCount() / getTotalQuestions()) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function renderSection() {
+  let section = allSections[currentSectionIdx];
+  let questions = getAllQuestionsInSection(section);
+  let container = document.getElementById('assessmentContent');
+
+  if (currentQ >= questions.length) {
+    // Move to next section
+    currentSectionIdx++;
+    currentQ = 0;
+    if (currentSectionIdx >= allSections.length) {
+      showResults();
+      return;
+    }
+    renderSection();
+    return;
+  }
+
+  let q = questions[currentQ];
+  updateProgress();
+
+  let headerHTML = '';
+  if (QUAD_INFO[section]) {
+    let info = QUAD_INFO[section];
+    headerHTML = `
+      <div class="quad-header">
+        <div class="quad-icon ${info.color}">${info.icon}</div>
+        <div>
+          <div class="quad-title" style="color:var(--${info.color})">${info.name}</div>
+          <div class="quad-subtitle">${info.subtitle}</div>
+        </div>
+      </div>`;
+  } else if (section === 'lifestyle') {
+    headerHTML = `
+      <div class="quad-header">
+        <div class="quad-icon" style="background:rgba(108,92,231,0.1);color:var(--accent2);border:1px solid rgba(108,92,231,0.2)">L</div>
+        <div>
+          <div class="quad-title" style="color:var(--accent2)">生活方式整合</div>
+          <div class="quad-subtitle">你的四个象限如何互动 — 真实的日常，而非理想化的版本</div>
+        </div>
+      </div>`;
+  } else if (section === 'glitch') {
+    headerHTML = `
+      <div class="quad-header">
+        <div class="quad-icon" style="background:rgba(253,121,168,0.1);color:var(--spirit);border:1px solid rgba(253,121,168,0.2)">G</div>
+        <div>
+          <div class="quad-title" style="color:var(--spirit)">漏洞评估</div>
+          <div class="quad-subtitle">高风险加速器 — AI、致幻剂、极端变动……你准备好了吗？</div>
+        </div>
+      </div>`;
+  } else if (section === 'regression') {
+    headerHTML = `
+      <div class="quad-header">
+        <div class="quad-icon" style="background:rgba(255,107,107,0.1);color:#ff6b6b;border:1px solid rgba(255,107,107,0.2)">R</div>
+        <div>
+          <div class="quad-title" style="color:#ff6b6b">退行检测</div>
+          <div class="quad-subtitle">哪些能力正在生锈？哪些领域在倒退？</div>
+        </div>
+      </div>`;
+  }
+
+  // Phase dots
+  let dotsHTML = '<div class="phase-indicator">';
+  for (let i = 0; i < allSections.length; i++) {
+    let cls = i < currentSectionIdx ? 'done' : (i === currentSectionIdx ? 'active' : '');
+    dotsHTML += `<div class="phase-dot ${cls}"></div>`;
+  }
+  dotsHTML += '</div>';
+
+  let qNum = getAnsweredCount() + 1;
+  let total = getTotalQuestions();
+  let selectedVal = answers[q.id];
+
+  let optionsHTML = '';
+  if (q.options) {
+    optionsHTML = '<div class="options-list">';
+    let labels = ['', 'Level 1.0 顺从者', 'Level 2.0 个人主义者', 'Level 3.0 统合者'];
+    q.options.forEach((opt, i) => {
+      let isSelected = selectedVal !== undefined && parseInt(selectedVal) === opt.level;
+      optionsHTML += `
+        <div class="option-card ${isSelected ? 'selected' : ''}" onclick="selectOption('${q.id}', ${opt.level}, this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-label l${opt.level}">${labels[opt.level]}</div>
+            <div class="option-text">${opt.text}</div>
+          </div>
+        </div>`;
+    });
+    optionsHTML += '</div>';
+  }
+
+  container.innerHTML = `
+    ${dotsHTML}
+    ${headerHTML}
+    <div class="question-card active fade-in">
+      <div class="question-number">问题 ${qNum} / ${total}</div>
+      <div class="question-text">${q.text}</div>
+      ${optionsHTML}
+    </div>
+    <div class="nav-buttons">
+      <button class="btn-nav" onclick="prevQuestion()" ${currentQ === 0 && currentSectionIdx === 0 ? 'disabled style="opacity:0.3"' : ''}>上一题</button>
+      <button class="btn-nav next" onclick="nextQuestion()">${currentQ === questions.length - 1 && currentSectionIdx === allSections.length - 1 ? '查看结果' : '下一题'}</button>
+    </div>`;
+
+  // Auto scroll
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectOption(qid, level, el) {
+  // Deselect siblings
+  el.parentElement.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qid] = String(level);
+  updateProgress();
+}
+
+function saveAnswer(id, value) {
+  answers[id] = value;
+  updateProgress();
+}
+
+function nextQuestion() {
+  let section = allSections[currentSectionIdx];
+  let questions = getAllQuestionsInSection(section);
+  currentQ++;
+  if (currentQ >= questions.length) {
+    currentSectionIdx++;
+    currentQ = 0;
+    if (currentSectionIdx >= allSections.length) {
+      showResults();
+      return;
+    }
+  }
+  renderSection();
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+  } else if (currentSectionIdx > 0) {
+    currentSectionIdx--;
+    currentQ = getAllQuestionsInSection(allSections[currentSectionIdx]).length - 1;
+  }
+  renderSection();
+}
+
+// ==================== ANALYSIS ENGINE ====================
+function analyzeQuadrant(quad) {
+  let qs = QUESTIONS[quad];
+  let levels = [];
+  let answered = 0;
+
+  for (let q of qs) {
+    if (answers[q.id] !== undefined && answers[q.id] !== '') {
+      levels.push(parseInt(answers[q.id]));
+      answered++;
+    }
+  }
+
+  if (answered === 0) return { level: 1.5, stage: 'dissonance', confidence: 0.3 };
+
+  // Weighted average: phase matters — initial questions weight more
+  let weights = { initial: 1.2, level_check: 1.0, stage_check: 0.8, traits: 0.9 };
+  let weightedSum = 0, totalWeight = 0;
+  qs.forEach((q, i) => {
+    if (answers[q.id] !== undefined && answers[q.id] !== '') {
+      let w = weights[q.phase] || 1;
+      weightedSum += parseInt(answers[q.id]) * w;
+      totalWeight += w;
+    }
+  });
+
+  let score = totalWeight > 0 ? weightedSum / totalWeight : 1.5;
+
+  // Stage detection based on level distribution
+  let avg = levels.reduce((a, b) => a + b, 0) / levels.length;
+  let variance = levels.reduce((s, l) => s + Math.pow(l - avg, 2), 0) / levels.length;
+
+  let stage;
+  // If most answers are the same low level but the person is taking the assessment = dissonance
+  let lowCount = levels.filter(l => l === 1).length;
+  let highCount = levels.filter(l => l === 3).length;
+
+  if (lowCount >= answered * 0.5) {
+    stage = 'dissonance'; // Stuck at level 1 patterns
+  } else if (variance > 0.5) {
+    stage = 'uncertainty'; // Mixed signals = exploring
+  } else if (avg >= 2.3) {
+    stage = 'discovery'; // Consistently high = integrating
+  } else {
+    stage = 'uncertainty';
+  }
+
+  return {
+    level: Math.round(score * 10) / 10,
+    stage,
+    signals: { l1: levels.filter(l => l === 1).length, l2: levels.filter(l => l === 2).length, l3: levels.filter(l => l === 3).length },
+    confidence: Math.min(0.95, 0.3 + answered * 0.08)
+  };
+}
+
+function determineArchetype(quadResults) {
+  let levels = {};
+  for (let q of QUADRANTS) levels[q] = quadResults[q].level;
+
+  let dominant = QUADRANTS.reduce((a, b) => levels[a] > levels[b] ? a : b);
+  let weakest = QUADRANTS.reduce((a, b) => levels[a] < levels[b] ? a : b);
+  let avg = QUADRANTS.reduce((s, q) => s + levels[q], 0) / 4;
+
+  let spread = Math.max(...QUADRANTS.map(q => levels[q])) - Math.min(...QUADRANTS.map(q => levels[q]));
+
+  if (levels.vocation >= 2.5 && spread > 1) return 'workaholic';
+  if (levels.mind >= 2.5 && levels.spirit >= 2 && levels.body < 1.8) return 'seeker';
+  if (levels.body >= 2.3 && levels.mind >= 2.3 && levels.spirit < 1.8 && levels.vocation < 1.8) return 'optimizer';
+  if (avg < 1.8 && spread < 0.8) return 'drifter';
+  if (spread > 1.5) return 'specialist';
+  if (avg >= 2.2 && spread < 0.8) return 'integrated';
+  // default
+  if (levels.vocation >= levels.mind && levels.vocation >= levels.body) return 'workaholic';
+  if (levels.mind >= levels.body && levels.mind >= levels.spirit) return 'seeker';
+  if (levels.body >= levels.vocation) return 'optimizer';
+  return 'drifter';
+}
+
+function generateMetatype(quadResults, archetype) {
+  let levels = {};
+  for (let q of QUADRANTS) levels[q] = quadResults[q].level;
+  let dominant = QUADRANTS.reduce((a, b) => levels[a] > levels[b] ? a : b);
+  let weakest = QUADRANTS.reduce((a, b) => levels[a] < levels[b] ? a : b);
+  let avg = QUADRANTS.reduce((s, q) => s + levels[q], 0) / 4;
+
+  let metatypes = {
+    workaholic: { name: '高速运转的齿轮', desc: '你在事业象限投入了最多的能量，思维敏捷、行动力强，但其他象限可能正在被悄悄掏空。你的产出令人印象深刻，但代价可能比你想的大。' },
+    seeker: { name: '清醒的旁观者', desc: '你对内在世界的探索远超常人，能看到别人看不到的模式。但洞察力如果没有落地，就只是更精致的逃避。你的心智是武器，但武器需要战场。' },
+    optimizer: { name: '精密的自我系统', desc: '你对自己身体和思维的掌控令人钦佩，体系完善、纪律严明。但过度优化可能导致与他人的疏离，以及在更大的意义问题上感到空虚。' },
+    drifter: { name: '多元未定型', desc: '你触及了很多领域但没有深入任何一个，像一块海绵吸收一切但尚未凝聚成形状。这不是缺陷——这是选择的富余，但选择本身也需要练习。' },
+    specialist: { name: '单维锋刃', desc: '你在一个领域达到了令人瞩目的深度，像一把锋利的手术刀。但单维度的高手在多维度的世界里是脆弱的。你最大的成长空间恰恰在你最忽视的地方。' },
+    integrated: { name: '多维整合者', desc: '你是罕见的类型——没有明显的短板，各象限相互支持。这并不意味着完美，而是意味着你的问题比别人的更高级。你已经从"生存"进入了"进化"。' }
+  };
+
+  return metatypes[archetype] || metatypes.drifter;
+}
+
+function getQuadArchetypeName(quad, level) {
+  let names = {
+    mind: [
+      ['NPC / 复读机', '沉睡的接收者'],
+      ['质疑者 / 分析师', '逆反的思想者'],
+      ['系统思考者', '元心智']
+    ],
+    body: [
+      ['电视迷 / 久坐者', '被动型身体'],
+      ['健身狂 / 生物黑客', '自我优化者'],
+      ['整合运动者', '身体艺术家']
+    ],
+    spirit: [
+      ['从众者 / 盲目信仰', '传统的追随者'],
+      ['灵性购物者 / 虚无主义者', '孤独的探索者'],
+      ['现代神秘主义者', '桥梁建造者']
+    ],
+    vocation: [
+      ['打卡族 / 薪水奴隶', '系统内的齿轮'],
+      ['奋斗者 / 创业者', '规则优化者'],
+      ['使命驱动者', '游戏设计者']
+    ]
+  };
+  let idx = level < 1.8 ? 0 : (level < 2.5 ? 1 : 2);
+  return names[quad][idx];
+}
+
+function getQuadLevelDesc(quad, level, stage) {
+  let descs = {
+    mind: {
+      1: '你的心智在很大程度上受到外部编程——接受的观念、社会规范和权威框架的塑造。你可能在重复而非思考。',
+      2: '你已经开始独立思考，质疑既定叙事，形成自己的观点。但要注意：反对不等于理解，叛逆不是智慧。',
+      3: '你能在矛盾中看到统一，在混乱中识别模式。你能有意识地切换视角，选择何时深入、何时抽离。这是真正的认知自由。'
+    },
+    body: {
+      1: '你的身体实践主要被外部因素驱动——或者被严重忽视。你可能知道健康重要，但知识没有转化为行动。',
+      2: '你已经建立了身体实践的意识，可能在健身、营养或生物黑客方面有持续投入。但要注意是否过度痴迷指标而忽略了身体的直觉信号。',
+      3: '你的身体实践已经融入生活方式——不再需要意志力维持，而是自然流淌的一部分。你理解身体与心智、精神、事业的深层连接。'
+    },
+    spirit: {
+      1: '你的精神生活主要被既定框架定义——可能是传统、社会期望或逃避。你可能在深度连接上有所缺失，或者用忙碌填补空虚。',
+      2: '你已经开始探索意义的深层问题，可能在灵性、哲学或社区参与上有投入。但要注意灵性逃避——用"更高层次"的洞察来回避现实的粗糙。',
+      3: '你已经将意义构建整合进日常生活——不需要退隐山林也能感受到深度连接。你能同时拥抱世俗与神圣，在日常中找到超越性。'
+    },
+    vocation: {
+      1: '你的职业生活主要由外部因素驱动——经济需求、社会期望或惯性。你可能在"别人的游戏"里努力表现，而不是在创造自己的游戏。',
+      2: '你已经展现出职业自主性——可能在创业、副业或职业转型上有尝试。但要注意：忙碌不等于有价值，收入不等于自由。',
+      3: '你的事业已经从"谋生"进化为"价值创造"——你不仅在解决问题，还在定义什么问题值得解决。经济自由是副产品，不是目标。'
+    }
+  };
+  return descs[quad][level < 1.8 ? 1 : (level < 2.5 ? 2 : 3)];
+}
+
+function getStageDesc(stage) {
+  return {
+    dissonance: '你正在耗尽当前阶段的资源，隐约感到不安。这种不适不是问题——它是成长的信号。',
+    uncertainty: '你已经踏入未知领域，正在收集信息和经验。这段时期的脆弱是正常的。',
+    discovery: '你正在整合新能力，接近一个阶段的完成。保持记录——这些发现是下一阶段的燃料。'
+  }[stage];
+}
+
+function generateStrategy(quadResults, archetype) {
+  let levels = {};
+  let stages = {};
+  for (let q of QUADRANTS) {
+    levels[q] = quadResults[q].level;
+    stages[q] = quadResults[q].stage;
+  }
+  let weakest = QUADRANTS.reduce((a, b) => levels[a] < levels[b] ? a : b);
+  let dominant = QUADRANTS.reduce((a, b) => levels[a] > levels[b] ? a : b);
+  let secondWeakest = QUADRANTS.filter(q => q !== weakest).reduce((a, b) => levels[a] < levels[b] ? a : b);
+
+  let quadNames = { mind: '心智', body: '身体', spirit: '精神', vocation: '事业' };
+  let strategies30 = {
+    mind: {
+      problem: '思维模式僵化，容易陷入回音室',
+      practices: ['每天花 15 分钟写下你今天"理所当然"接受的三个观点，然后尝试反驳每一个', '阅读一篇与你立场完全相反的文章，不评价，只理解', '开始一个"思维日志"——记录让你不舒服的观点和你对它的反应'],
+      challenge: '本周与一个观点完全不同的人进行一次真正的对话——目标是理解，不是说服'
+    },
+    body: {
+      problem: '身体实践缺失或不一致，精力不足影响了所有其他象限',
+      practices: ['建立"非协商的 30 分钟"——每天固定时间运动，不谈判', '记录一周的睡眠和饮食，找出最明显的三个破坏性习惯', '尝试站立工作或散步会议，把身体活动嵌入日常工作'],
+      challenge: '本周尝试一种从未做过的运动形式——瑜伽、游泳、攀岩、任何新的'
+    },
+    spirit: {
+      problem: '深度关系缺失，意义感模糊，可能存在灵性逃避',
+      practices: ['每周主动联系一个重要但疏远的人——不是为了社交，而是为了真正连接', '每天花 10 分钟写下"今天什么让我感到活着"', '识别你的"逃避模式"——什么时候你会用忙碌/学习/健身来回避情感'],
+      challenge: '向一个信任的人袒露一个你一直在隐藏的脆弱'
+    },
+    vocation: {
+      problem: '在"别人的游戏"里努力，缺乏真正的价值创造和系统思维',
+      practices: ['每天花 20 分钟在"没有即时回报"的事情上——写作、学习、构建', '写下你的"如果金钱不是问题"答案，然后评估你当前工作与它的距离', '识别你工作中可以被自动化的部分，开始用 AI 或系统替代它'],
+      challenge: '本周开始一个小的副业实验或个人项目——不需要完美，只需要开始'
+    }
+  };
+
+  let weakestStrat = strategies30[weakest];
+
+  return {
+    weakest,
+    weakestName: quadNames[weakest],
+    dominant,
+    dominantName: quadNames[dominant],
+    strategies30: weakestStrat,
+    crossTraining: `${quadNames[dominant]}的发展可以催化${quadNames[weakest]}的成长——因为当你${levels[dominant] >= 2.5 ? '已经在一个领域建立了自信和纪律' : '在一个领域投入精力时'}，那种能量可以自然溢出到薄弱领域。关键不是"平衡时间"，而是找到${quadNames[dominant]}和${quadNames[weakest]}之间的连接点。`,
+    evolution: `一旦${quadNames[weakest]}象限开始改善，你可能会发现${quadNames[secondWeakest]}象限的问题浮出水面。这是正常的进化螺旋——解决一个问题总会揭示下一个。`
+  };
+}
+
+function getGlitchGuidance(avgLevel, quadResults) {
+  let glitchQs = ADDITIONAL_QUESTIONS.glitch;
+  let glitchLevels = glitchQs.map(q => answers[q.id] !== undefined ? parseInt(answers[q.id]) : 1);
+  let glitchAvg = glitchLevels.reduce((a, b) => a + b, 0) / glitchLevels.length;
+  let aiHeavy = glitchAvg <= 1.5;
+  let psychedelicMention = glitchLevels[1] >= 2;
+  let extremeChange = glitchLevels[2] >= 2;
+
+  if (avgLevel < 2.0) {
+    return {
+      level: 'low',
+      title: '漏洞警告',
+      color: '#ff6b6b',
+      content: '在你当前的发展水平，漏洞（AI 过度依赖、致幻剂、极端生活变动等）不推荐使用。你缺乏安全整合加速体验的基础。在接下来的 6-12 个月内专注于自然发展——建立知识、经验和技能的根基。' + (aiHeavy ? '\n\n特别注意：你似乎在广泛使用 AI。确保 AI 是你的工具而非拐杖——保持你自己的思考能力。定期尝试在没有 AI 辅助的情况下完成思考和写作任务。' : ''),
+      risks: aiHeavy ? ['AI 精神错乱 — 与未增强的现实失去联系', '大脑外包 — 自然思维能力萎缩', '能力错觉 — 将 AI 的能力误认为自己的'] : ['基础不足导致整合失败', '退行到更低的发展层级', '创伤性体验而非成长性体验']
+    };
+  } else if (avgLevel < 2.5) {
+    return {
+      level: 'medium',
+      title: '漏洞考量',
+      color: '#fdcb6e',
+      content: '你有一定基础但高风险依然存在。如果考虑使用漏洞，需要大量准备和明确目标。' + (aiHeavy ? '\n\n你的 AI 使用需要更有意识：定义哪些任务是"增强"，哪些是"替代"，警惕后者。' : '') + (psychedelicMention ? '\n\n你的意识探索是好事，但确保有整合实践（日记、冥想、导师）来处理这些体验。' : ''),
+      risks: ['依赖形成 — 没有工具协助就无法运作', '整合不完整 — 体验了但没学到', '退行风险 — 压力下回到旧模式']
+    };
+  } else {
+    return {
+      level: 'high',
+      title: '漏洞潜力',
+      color: '#00b894',
+      content: '你有足够的基础做出明智决定。漏洞可以成为有意识的发展工具。' + (aiHeavy ? '\n\nAI 作为元漏洞最适合你 — 你已经有辨别力来区分增强和依赖。确保持续挑战自己保持独立思考。' : ''),
+      risks: ['身份消解 — 需要定期"断开"来确认自我', '过度优化 — 记住有些东西不应该被"黑客"', '代价意识 — 即使准备完美，高回报机制也有代价']
+    };
+  }
+}
+
+function getComparable(archetype, quadResults) {
+  let comparables = {
+    workaholic: [
+      { name: '科技 CEO 型', desc: '和你一样在事业象限投入巨大，但他们通常也维持了身体实践（晨跑、私人教练）来支撑高强度工作', diff: '更多身体基础' },
+      { name: '创作者型', desc: '同样以产出为导向，但他们将事业与精神象限连接——创作本身即是意义探索', diff: '更多精神连接' }
+    ],
+    seeker: [
+      { name: '哲学家-行动者型', desc: '和你一样思想深度出众，但他们的洞察力总是流向具体的行动和创造', diff: '更多落地执行' },
+      { name: '跨学科研究者', desc: '同样博学，但他们用知识连接不同领域而非仅在思想内游荡', diff: '更多跨域整合' }
+    ],
+    optimizer: [
+      { name: '整合运动员型', desc: '和你一样注重身体优化，但他们也将同样的系统性思维应用于关系和社区', diff: '更多关系投资' },
+      { name: '生物黑客-创业者型', desc: '同样精于自我优化，但他们将身体优势转化为事业杠杆', diff: '更多事业杠杆' }
+    ],
+    drifter: [
+      { name: '晚熟型全才', desc: '和你一样广泛涉猎，但他们最终找到一个象限深入后，其他领域的积累爆发性地赋能了那个深度', diff: '更多持续专注' },
+      { name: '体验收集者型', desc: '同样多样，但他们在每次体验后都有明确的收获和整合', diff: '更多反思整合' }
+    ],
+    specialist: [
+      { name: 'T 型人才型', desc: '和你一样在一个领域有深度，但他们有意识地培养 2-3 个辅助领域的"足够好"水平', diff: '更多广度意识' },
+      { name: '领域桥梁者', desc: '同样专精，但他们用专业知识连接不同领域，成为翻译者和整合者', diff: '更多跨界应用' }
+    ],
+    integrated: [
+      { name: '系统设计师型', desc: '和你一样全面发展，但他们在设计让他人也能整合的系统——教学、写作、创建社区', diff: '更多规模化' },
+      { name: '生活方式企业家', desc: '同样整合度高，但他们把生活方式本身变成了产品——通过分享自己的整合方式创造价值', diff: '更多价值外化' }
+    ]
+  };
+  return comparables[archetype] || comparables.drifter;
+}
+
+// ==================== RESULTS ====================
+function showResults() {
+  document.getElementById('assessment').style.display = 'none';
+  let results = document.getElementById('results');
+  results.style.display = 'block';
+
+  // Analyze
+  let quadResults = {};
+  for (let q of QUADRANTS) quadResults[q] = analyzeQuadrant(q);
+  let archetype = determineArchetype(quadResults);
+  let metatype = generateMetatype(quadResults, archetype);
+  let strategy = generateStrategy(quadResults, archetype);
+  let avgLevel = QUADRANTS.reduce((s, q) => s + quadResults[q].level, 0) / 4;
+  let glitchGuide = getGlitchGuidance(avgLevel, quadResults);
+  let comparables = getComparable(archetype, quadResults);
+  let stageNames = { dissonance: '不谐', uncertainty: '不确定', discovery: '发现' };
+  let levelNames = { 1: 'Level 1.0 — 顺从者', 2: 'Level 2.0 — 个人主义者', 3: 'Level 3.0 — 统合者' };
+
+  function getLevelNum(level) { return level < 1.8 ? 1 : (level < 2.5 ? 2 : 3); }
+
+  // Build HTML
+  let html = '';
+
+  // Header
+  html += `
+    <div class="result-header">
+      <h1>你的 HUMAN 3.0 发展评估</h1>
+      <div class="metatype-badge">${metatype.name}</div>
+      <p class="metatype-desc">${metatype.desc}</p>
+    </div>`;
+
+  // Lifestyle Archetype
+  let archNames = {
+    workaholic: '工作狂', seeker: '求索者', optimizer: '优化狂',
+    drifter: '漂泊者', specialist: '专才', integrated: '整合者'
+  };
+  let archDescs = {
+    workaholic: '你的事业象限消耗了绝大部分精力。心智可能紧张，身体可能被忽视，精神可能空虚。核心问题：以牺牲一切为代价换取职业成功。解决方案：通过自动化释放时间，然后重建被忽视的象限。',
+    seeker: '你的精神和心智象限较重，身体和事业可能偏弱。你有很多洞察但可能缺乏实际应用。核心问题：对物质现实的灵性逃避。解决方案：通过身体实践和价值创造使洞察落地。',
+    optimizer: '你的身体和心智聚焦，精神和事业可能浅薄。你在打磨自己但可能孤立于更大的意义之外。核心问题：在孤立中优化而没有连接和贡献。解决方案：将优化能力应用于人际关系和有意义的工作。',
+    drifter: '没有一个象限得到深度发展，精力分散，浅尝辄止。核心问题：缺乏专注阻碍了任何真正的突破。解决方案：选择一个象限作为锚点，建立第一个深度基础。',
+    specialist: '一个象限处于高阶，其他处于低阶。在一个领域才华横溢，其他领域功能失调。核心问题：不平衡限制了专长的影响力。解决方案：在薄弱领域进行最小可行性发展。',
+    integrated: '所有象限处于中等以上水平且相互支持，领域间自然流动。核心问题：在成长期维持整合。解决方案：有意识的进化，同时开始教导他人。'
+  };
+
+  html += `
+    <div class="result-section">
+      <h2>生活方式原型：${archNames[archetype]}</h2>
+      <p style="color:var(--text2);font-size:0.95rem;">${archDescs[archetype]}</p>
+    </div>`;
+
+  // Quadrant details
+  for (let q of QUADRANTS) {
+    let r = quadResults[q];
+    let info = QUAD_INFO[q];
+    let archName = getQuadArchetypeName(q, r.level);
+    let levelDesc = getQuadLevelDesc(q, r.level, r.stage);
+    let levelNum = getLevelNum(r.level);
+    let levelName = levelNames[levelNum];
+    let stageName = stageNames[r.stage];
+    let stageDesc = getStageDesc(r.stage);
+
+    html += `
+      <div class="result-section">
+        <h2><div class="quad-icon ${info.color}" style="width:36px;height:36px;font-size:1.1rem;border-radius:8px">${info.icon}</div> ${info.name}：${archName}</h2>
+        <div class="quad-result">
+          <div class="quad-result-item">
+            <label>意识层级</label>
+            <p>${levelName}</p>
+            <div class="level-bar">${[1,2,3,4,5,6].map(i => {
+              let filled = i <= Math.round(r.level * 2);
+              return `<div class="level-segment ${filled ? 'filled-' + info.color : ''}"></div>`;
+            }).join('')}</div>
+          </div>
+          <div class="quad-result-item">
+            <label>当前阶段</label>
+            <p><span class="phase-label ${r.stage}">${stageName}</span></p>
+            <p style="margin-top:6px;font-size:0.88rem;color:var(--text2)">${stageDesc}</p>
+          </div>
+          <div class="quad-result-item full">
+            <label>深度分析</label>
+            <p style="font-size:0.92rem;line-height:1.8">${levelDesc}</p>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Cross-quadrant dynamics
+  let levels = {};
+  for (let q of QUADRANTS) levels[q] = quadResults[q].level;
+  let weakest = QUADRANTS.reduce((a, b) => levels[a] < levels[b] ? a : b);
+  let dominant = QUADRANTS.reduce((a, b) => levels[a] > levels[b] ? a : b);
+  let secondWeakest = QUADRANTS.filter(q => q !== weakest).reduce((a, b) => levels[a] < levels[b] ? a : b);
+
+  let chainWarning = '';
+  if (weakest === 'body') chainWarning = '如果身体继续退化，你的精力和认知能力会首先受到影响，进而拖累事业表现，最后侵蚀精神象限的连接感。身体的崩溃是系统性的。';
+  else if (weakest === 'mind') chainWarning = '如果心智象限停滞，你可能看不到事业中的机会，无法有效处理关系中的复杂性，也难以做出明智的身体决策。认知限制是所有限制之母。';
+  else if (weakest === 'spirit') chainWarning = '如果精神象限持续空虚，即使事业成功也会感到意义缺失，即使身体强壮也会感到孤独。没有连接的成功是精致的痛苦。';
+  else chainWarning = '如果事业象限受限，你可能负担不起健康投资，缺乏资源支持深度学习，也无法为社区做出贡献。经济基础限制了其他象限的发展天花板。';
+
+  html += `
+    <div class="result-section">
+      <h2>跨象限动态</h2>
+      <div class="cross-dynamics">
+        <div class="dynamic-item">
+          <div class="label" style="color:var(--${QUAD_INFO[weakest].color})">主要阻碍</div>
+          <p><strong>${QUAD_INFO[weakest].name}</strong> 象限正在限制你的整体发展。你在其他象限的很多问题可能根源都在这里。</p>
+        </div>
+        <div class="dynamic-item">
+          <div class="label" style="color:var(--${QUAD_INFO[dominant].color})">解锁机会</div>
+          <p><strong>${QUAD_INFO[dominant].name}</strong> 象限是你最强的杠杆点——用这里的能量和自信来催化薄弱领域。</p>
+        </div>
+        <div class="dynamic-item">
+          <div class="label">隐藏模式</div>
+          <p>${strategy.crossTraining}</p>
+        </div>
+        <div class="dynamic-item">
+          <div class="label" style="color:#ff6b6b">连锁预警</div>
+          <p>${chainWarning}</p>
+        </div>
+      </div>
+    </div>`;
+
+  // Core Problem
+  let coreProblems = {
+    mind: '你的思维模式决定了你如何解读所有的现实——包括你的健康、你的关系、你的事业。如果心智象限是瓶颈，你可能在其他三个象限的"问题"其实都是同一个问题的不同表现：你还没有学会如何真正独立地思考。',
+    body: '身体是所有象限的基础设施。精力、认知清晰度、情绪稳定性、自信心——全部依赖于身体的基线。如果你的身体象限是瓶颈，其他象限的投入都在沙滩上建城堡。',
+    spirit: '意义和连接是长期可持续性的燃料。没有它们，事业变成苦工，身体优化变成强迫症，心智发展变成精致的逃避。精神象限的缺失会在其他象限表现为"空虚感"。',
+    vocation: '事业象限为你提供资源、结构和影响力的杠杆。如果它受限，你可能缺乏支持其他象限发展所需的资源，同时在"谋生"中耗尽精力而无力"进化"。'
+  };
+
+  html += `
+    <div class="result-section" style="border-color:var(--accent);box-shadow:0 0 20px rgba(108,92,231,0.1)">
+      <h2>你要解决的核心问题</h2>
+      <p style="font-size:0.95rem;line-height:1.8;color:var(--text)">${coreProblems[weakest]}</p>
+    </div>`;
+
+  // 30-90-365 Strategy
+  let s = strategy.strategies30;
+  html += `
+    <div class="result-section">
+      <h2>生活方式转型策略</h2>
+      <div class="strategy-phase">
+        <h3>未来 30 天 — 问题识别阶段</h3>
+        <p style="color:var(--text2);font-size:0.92rem;margin-bottom:16px">核心问题：<strong style="color:var(--text)">${s.problem}</strong></p>
+        <div class="strategy-item"><strong>日常实践 1</strong><p>${s.practices[0]}</p></div>
+        <div class="strategy-item"><strong>日常实践 2</strong><p>${s.practices[1]}</p></div>
+        <div class="strategy-item"><strong>日常实践 3</strong><p>${s.practices[2]}</p></div>
+        <div class="strategy-item"><strong>每周挑战</strong><p>${s.challenge}</p></div>
+      </div>
+      <div class="strategy-phase" style="border-color:var(--body)">
+        <h3 style="color:var(--body)">未来 90 天 — 方案实施阶段</h3>
+        <div class="strategy-item"><strong>生活方式转变</strong><p>从"${archNames[archetype]}"的惯性模式，向更整合的方向进化。${strategy.crossTraining}</p></div>
+        <div class="strategy-item"><strong>问题演变</strong><p>${strategy.evolution}</p></div>
+        <div class="strategy-item"><strong>技能发展</strong><p>建立"${QUAD_INFO[weakest].name}象限"的基本能力，目标是达到可以不依赖意志力维持的最低有效水平。</p></div>
+      </div>
+      <div class="strategy-phase" style="border-color:var(--vocation)">
+        <h3 style="color:var(--vocation)">未来 6-12 个月 — 生活方式整合阶段</h3>
+        <div class="strategy-item"><strong>目标</strong><p>使各象限从"需要意志力维持"进化到"自然相互支持"。${QUAD_INFO[weakest].name}不再是你的短板，而成为你的差异化优势。</p></div>
+        <div class="strategy-item"><strong>新问题容量</strong><p>当基础问题解决后，你将准备好面对更高维度的问题——不是"如何生存"，而是"如何创造"和"如何贡献"。</p></div>
+      </div>
+    </div>`;
+
+  // Glitch Assessment
+  html += `
+    <div class="result-section glitch-section">
+      <h2>漏洞 (GLITCH) 评估</h2>
+      <div class="glitch-level" style="border-left:3px solid ${glitchGuide.color}">
+        <h3 style="color:${glitchGuide.color}">${glitchGuide.title}</h3>
+        <p style="font-size:0.92rem;line-height:1.8;white-space:pre-line">${glitchGuide.content}</p>
+      </div>
+      ${glitchGuide.risks.length > 0 ? `<div class="warning-box"><h3>需要警惕的风险</h3>${glitchGuide.risks.map(r => `<p>• ${r}</p>`).join('')}</div>` : ''}
+    </div>`;
+
+  // Regression Warning
+  let regressionLevels = ADDITIONAL_QUESTIONS.regression.map(q => answers[q.id] !== undefined ? parseInt(answers[q.id]) : 2);
+  let regressionLow = regressionLevels.filter(l => l <= 1).length;
+  if (regressionLow > 0) {
+    html += `
+      <div class="result-section">
+        <h2>退行检测</h2>
+        <div class="warning-box">
+          <h3>注意</h3>
+          <p>你的回答暗示某些领域可能在退化。退行不是失败——它是信号。通常由超出承受能力的压力触发，或由某个象限的长期忽视导致。关键是识别退行模式并重新激活，而不是用意志力强行对抗。回到基础，从小处开始。</p>
+        </div>
+      </div>`;
+  }
+
+  // Comparable types
+  html += `
+    <div class="result-section">
+      <h2>可比元类型</h2>
+      ${comparables.map(c => `
+        <div class="comparable">
+          <div class="name">类似于"${c.name}"</div>
+          <p>${c.desc}</p>
+        </div>
+      `).join('')}
+      <p style="margin-top:16px;font-size:0.9rem;color:var(--text3)">可以通过解决<strong style="color:var(--text2)">${QUAD_INFO[weakest].name}象限</strong>的核心问题向更高阶的元类型进化。</p>
+    </div>`;
+
+  // Next Step
+  html += `
+    <div class="next-step-box">
+      <h2>你立即的下一步行动</h2>
+      <p style="font-size:1.05rem;line-height:1.8;max-width:600px;margin:0 auto">${s.practices[0]}</p>
+      <p style="font-size:0.85rem;color:var(--text3);margin-top:16px">就在今天，就在现在。不需要完美的计划——只需要开始。</p>
+    </div>`;
+
+  // Truth
+  let truthTexts = {
+    workaholic: '你的产出令人印象深刻，但你可能在用忙碌来回避一个你不愿面对的问题：当你停下来的时候，你是谁？工作狂的讽刺在于——你以为自己在追求成功，但成功之后的空虚才是真正的考验。你的薄弱象限不是"需要修的漏洞"，而是"被你回避的自己"。解决它不会让你效率降低——它会让你从"高效"变成"有影响力"。最大的风险不是失败，而是在错误的游戏里获胜。',
+    seeker: '你的洞察力可能是你最大的资产，也可能是你最精致的牢笼。你已经看穿了太多东西——但这到底让你更自由了，还是更瘫痪了？求索者的陷阱是：用更多的理解来回避行动。"我还没想清楚"有时候是"我害怕开始"的优雅版本。你不需要更多的洞察——你需要将你已有的洞察付诸实践。最好的洞察是那些被检验过的。',
+    optimizer: '你的自律令人敬佩，但自律本身不是目的。你在优化什么？为了什么？优化狂的盲点是：当所有指标都在改善但生活感觉空虚时，你可能会加更多的优化而不是停下来问"方向对吗？"。你需要的不是更多的效率——而是更多的意义和连接。将你卓越的系统能力转向关系和贡献，你会发现一个全新的游戏。',
+    drifter: '你的多样性不是缺陷——它是未被聚焦的潜力。漂泊者的核心问题不是"缺乏专注"，而是"还没有找到值得专注的东西"。但这里有个残酷的真相：有时候你不是在等待灵感——你是在逃避承诺。承诺意味着放弃其他可能性，而放弃是痛苦的。选择一个象限作为锚点，不是放弃其他，而是建立第一个深度基础。一旦你在一个领域建立了真正的能力，你会发现其他领域的学习速度会爆发性地加快。',
+    specialist: '你的深度是你最大的资产，但它也可能成为你最大的限制。单维锋刃的残酷真相是：世界正在奖励多维整合者。你不需要放弃你的专业——你需要在薄弱领域建立"最小可行性能力"。你的专业知识加上跨象限整合能力，会创造别人无法复制的竞争优势。这不是"分散精力"——这是"扩大战场"。',
+    integrated: '你已经是最稀有的类型之一。但整合不是终点——它是新的起点。你现在面对的问题比大多数人的更高级：不是"如何生存"，而是"如何创造最大的杠杆"。不要满足于维持现状。你有基础去使用漏洞——不是鲁莽地，而是有意识地。你的下一个进化不是更多的整合——而是将你的整合能力外化为价值创造。教别人、建系统、创造工具。'
+  };
+
+  html += `
+    <div class="truth-section">
+      <h2 style="margin-bottom:16px;font-size:1.15rem">关于你处境的真相</h2>
+      <p>${truthTexts[archetype]}</p>
+    </div>`;
+
+  // Closing
+  html += `
+    <div style="text-align:center;padding:32px 0;color:var(--text3);font-size:0.88rem;line-height:1.8">
+      <p style="margin-bottom:8px;font-size:0.95rem;color:var(--text2)">变得多维强悍——不是通过在所有领域苦熬，<br>而是通过解决那些解锁自然整合的问题。</p>
+      <p>只有当你已最大化自然潜力并能有意识地接受后果时，才使用漏洞。</p>
+    </div>
+    <button class="btn-restart" onclick="restart()">重新评估</button>`;
+
+  results.innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function restart() {
+  answers = {};
+  currentSectionIdx = 0;
+  currentQ = 0;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('landing').style.display = 'flex';
+  document.getElementById('progressFill').style.width = '0%';
+}
+</script>
+</body>
+</html>
